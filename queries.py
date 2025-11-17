@@ -202,12 +202,12 @@ from decimal import Decimal
 # New Lecture AGGREGATE && ANNOTATE
 # =====================================================
 
-from library.models import Book, Category
+from library.models import Book, Category, Borrow, User
 from django.db.models import (
     Avg,
     Count,
     Min,
-    Max
+    Max, Q
 )
 from typing import Any
 
@@ -263,3 +263,162 @@ from typing import Any
 # for obj in books_by_category:
 #     print(f"Категории: {obj['name_category']}, кол-во книг = {obj['books_count']}")
 #
+
+### **Задача 2: Диапазон цен и общее количество страниц**
+# **ТЗ:** Найти минимальную, максимальную цену книг и общее количество страниц всех книг
+
+from library.models import Book, Category, Borrow
+from django.db.models import (
+    Avg,
+    Count,
+    Min,
+    Max,
+    Sum,
+    Case,
+    When,
+    Value,
+    CharField,
+    Subquery,
+    OuterRef,
+    F
+)
+
+from typing import Any
+
+#data = Book.objects.aggregate(min_price=Min("price"), max_price=Max("price"), total_pages=Sum("page_count")
+
+### **Задача 3: Количество книг по каждому жанру**
+# **ТЗ:** Подсчитать количество книг в каждом жанре, отсортировать по убыванию количества
+
+#count_book_by_ganre = Book.objects.values("name_category").annotate(book_count=Count("id"))
+
+# data = Book.objects.values('category').annotate(
+#     total_book=Count('id'),
+# ).order_by('-total_book')
+#
+# for book in data:
+#     print(book)
+
+### **Задача 4: Средняя цена книг по каждому издательству**
+# **ТЗ:** Вычислить среднюю цену книг для каждого издательства и количество книг у каждого издательства
+
+
+# data = Book.objects.values('publisher__name').annotate(
+#     avg_price=Avg("price"),
+#     books_count=Count("id")
+# ).order_by("books_count")
+#
+# for book in data:
+#     print(book)
+
+### **Задача 6: Топ-5 читателей по количеству активных займов**
+# **ТЗ:** Найти 5 пользователей с наибольшим количеством невозвращенных книг
+
+
+#1
+# data = Borrow.objects.values('member__username').annotate(
+#     count_aktiv_borrow=Count(
+#         'id', filter=Q(returned=False))).order_by('-count_aktiv_borrow')[:5]  # 0 -4 index
+# print(data)
+#
+# for el in data:
+#     print(el)
+
+#2
+
+# data = (
+#     User.objects
+#     .values('last_name', 'first_name')
+#     .annotate(
+#         borrows_count=Count(
+#             'borrows',
+#             filter=Q(borrows__returned=False)
+#         )
+#     )
+#     .order_by('-borrows_count')
+# )[:5]
+#
+# print(data)
+#
+# for el in data:
+#     print(el)
+
+#3
+# data = (
+#     User.objects
+#     .values('last_name', 'first_name')
+#     .annotate(
+#         borrows_count=Count(
+#             'borrows',
+#             filter=Q(borrows__returned=False)
+#         )
+#     )
+#     .order_by('-borrows_count')
+# )[:5]
+
+# for el in data:
+#     print(el)
+
+### **Задача 8: Книги с количеством займов и статусом популярности**
+# **ТЗ:** Для каждой книги подсчитать количество займов и пометить как популярную (>3 займов) или обычную
+
+# data = (
+#     Book.objects
+#     .annotate(
+#         borrow_cnt=Count("borrows"),
+#         populate_status=Case(
+#             When(condition=Q(borrow_cnt__gt=3), then=Value("Popular")),
+#             default=Value("Ordenary"),
+#             output_field=CharField())
+#     ).order_by("-borrow_cnt")
+# )
+#
+# for d in data[:10]:
+#     print(f"{d.title=} --- {d.populate_status=} --- {d.borrow_cnt=}")
+
+### **Задача 10: Книги дороже средней цены в своем жанре**
+# **ТЗ:** Найти книги, цена которых превышает среднюю цену книг в том же жанре
+
+# avg_price_subquery = (
+#     Book.objects
+#     .filter(category=OuterRef("category"))
+# ).values("category").annotate(avg_price=Avg("price")).values("avg_price")
+#
+# data = (
+#     Book.objects
+#     .annotate(
+#         avg_price_genre=Subquery(avg_price_subquery)
+#     )
+#     .filter(price__gt=F("avg_price_genre"))
+# )
+#
+#
+# for d in data:
+#     print(f"{d.title=} --- {d.category=}:")
+#     print(f"{d.price=} --- {d.avg_price_genre=}")
+
+
+#тоже задание, но если речь идет про конкретные категории(жанры)
+
+avg_price_subquery = (
+    Book.objects
+    .filter(category=OuterRef("category"))
+).values("category").annotate(avg_price=Avg("price")).values("avg_price")
+
+data = (
+    Book.objects
+    .annotate(avg_price_genre=Subquery(avg_price_subquery))
+    .filter(
+        category__in=[1,2], #vybor categorii
+        price__gt=F('avg_price_genre'))
+)
+
+
+for d in data:
+    print(f"{d.title=} --- {d.category=}:")
+    print(f"{d.price=} --- {d.avg_price_genre=}")
+
+
+
+
+
