@@ -4,23 +4,41 @@ from django.db.models import Count
 from rest_framework import serializers
 
 from library.models import Book, User
+from library.serializers.authors import AuthorShortInfoSerializer
+from library.serializers.categories import CategorySerializer
 
 
 class BookListSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    author = AuthorShortInfoSerializer()
+
     class Meta:
         model = Book
         fields = [
             'id',
             'title',
             'price',
-            'publication_date'
+            'publication_date',
+            'category',
+            'author'
         ]
 
 
 class BookDetailedSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    author = AuthorShortInfoSerializer()
+
     class Meta:
         model = Book
-        fields = '__all__'
+        # fields = '__all__'
+        fields = [
+            'id',
+            'title',
+            'publication_date',
+            'category',
+            'author',
+            'rating',
+        ]
 
 
 class BookCreateSerializer(serializers.ModelSerializer):
@@ -34,8 +52,37 @@ class BookCreateSerializer(serializers.ModelSerializer):
             'publisher',
             'contributor',
             'author',
-            'price'
+            'price',
+            'discounted_price'
         )
+
+    # def validate()
+    # def validate_<column_name>()
+    def validate_title(self, value: str) -> str:
+        if not all(word.isalnum() for word in value.split(' ')):
+            raise serializers.ValidationError(
+                # "Название книги должно состоять только из алфавита, пробелов и цифр."
+                "Название книги не должно содержать сторонних спец. символов"
+            )
+
+        return value
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        price = attrs.get('price')
+        discounted_price = attrs.get('discounted_price')
+
+        if price and discounted_price and discounted_price > price:
+            raise serializers.ValidationError(
+                {
+                    "discounted_price": "Цена со скидкой не должна быть больше, чем оригинальная цена"
+                }
+            )
+
+        # Если не будет return:
+        #
+        # Данные приходят в валидатор => запускаются все проверки => данные выкидываются
+        #
+        return attrs
 
     def create(self, validated_data: dict[str, Any]) -> Book:
         contributor = validated_data.get('contributor')

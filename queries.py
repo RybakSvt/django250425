@@ -309,24 +309,24 @@ from django.db.models import (Count, Q)
 
 # ПОЛУЧИТЬ список книг цена которых выше срадней у того же автора
 
-from django.db.models import F
-
-subquery = (
-    Book.objects
-    .filter(author=OuterRef('author'))
-    .values('author')
-    .annotate(avg_price=Avg('price'))
-    .values('avg_price')
-)
-
-
-general_query = (
-    Book.objects
-    .annotate(avg_price_by_author=Subquery(subquery))
-    .filter(
-        price__gt=F('avg_price_by_author')
-    )
-)
+# from django.db.models import F
+#
+# subquery = (
+#     Book.objects
+#     .filter(author=OuterRef('author'))
+#     .values('author')
+#     .annotate(avg_price=Avg('price'))
+#     .values('avg_price')
+# )
+#
+#
+# general_query = (
+#     Book.objects
+#     .annotate(avg_price_by_author=Subquery(subquery))
+#     .filter(
+#         price__gt=F('avg_price_by_author')
+#     )
+# )
 
 """
 SELECT t1.*, (
@@ -341,43 +341,90 @@ WHERE
 ;
 """
 
+#
+# from rest_framework import serializers
+# from library.models import Category
+#
+#
+# class UserCustomSerializer(serializers.Serializer):
+#     name = serializers.CharField(max_length=25)
+#     age = serializers.IntegerField(min_value=15)
+#     is_active = serializers.BooleanField()
+#     created_at = serializers.DateTimeField()
+#
+#
+# class CategorySerializer(serializers.ModelSerializer):
+#     # name_categoy = ...
+#
+#     class Meta:
+#         model = Category
+#         fields = "__all__"
+#         # fields = ["id", "category_name"]
+#
+#
+# raw_data = {
+#     "name": "Johnny",
+#     "age": 18,
+#     "is_active": True,
+#     "created_at": "2022-09-17T16:31:15",
+# }
+#
+#
+# data = UserCustomSerializer(data=raw_data)
+#
+# print(data)
+#
+#
+# if data.is_valid():
+#     print(data.validated_data)
+#
+# else:
+#     print("ДАННЫЕ НЕВАЛИДНЫ")
+#     print(data.errors)
 
-from rest_framework import serializers
-from library.models import Category
 
 
-class UserCustomSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=25)
-    age = serializers.IntegerField(min_value=15)
-    is_active = serializers.BooleanField()
-    created_at = serializers.DateTimeField()
+# class Book:
+#     title = "TEST"
+#     price = 22.9
+#     pages = 228
+#
+#     def __str__(self):
+#         return f"{self.title=} {self.price=} {self.pages=}"
+#
+#
+#
+# validated_data = {
+#     "price": 99
+# }
+# book = Book()
+#
+#
+# for attr, value in validated_data.items():
+#     setattr(book, attr, value)
+#
+#
+# print(book)
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    # name_categoy = ...
+title = "TEST TITLE"
 
-    class Meta:
-        model = Category
-        fields = "__all__"
-        # fields = ["id", "category_name"]
+print(title.replace(" ", "").isalnum())
 
-
-raw_data = {
-    "name": "Johnny",
-    "age": 18,
-    "is_active": True,
-    "created_at": "2022-09-17T16:31:15",
-}
+# "$#@!_-+=*&^%><?/\|"
+#
+# result = all(word.isalnum() for word in title.split(' '))
+#
+# print(result)
 
 
-data = UserCustomSerializer(data=raw_data)
+Book.objects.filter(
+    publication_date__year=1997,
+    publication_date__month=7,
+    publication_date__day=5,
+)
 
-print(data)
 
-
-if data.is_valid():
-    print(data.validated_data)
-
-else:
-    print("ДАННЫЕ НЕВАЛИДНЫ")
-    print(data.errors)
+# http://localhost:8000/subtasks/?parent_name=CREATE%20New%20Obj&status=In%20Progres
+# http://localhost:8000/subtasks/?status=In%20Progres
+# http://localhost:8000/subtasks/?parent_name=CREATE%20New%20Obj
