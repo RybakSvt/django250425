@@ -20,6 +20,8 @@ class BookListCreateAPIView(APIView):
 
         author_last_name = query_params.get('last_name')
         author_first_name = query_params.get('first_name')
+        book_year_from = query_params.get('year_from')
+        book_category = query_params.get('book_category')
 
         if author_last_name:
             queryset = queryset.filter(
@@ -31,7 +33,23 @@ class BookListCreateAPIView(APIView):
                 author__first_name=author_first_name
             )
 
+        if book_year_from:
+            if book_year_from.isdigit():
+                book_year_from = int(book_year_from)
+                queryset = queryset.filter(
+                    publication_date__year__gt = book_year_from
+                )
+            else:
+                queryset = queryset.none()
+
+        if book_category:
+            queryset = queryset.filter(
+                category__name_category = book_category
+            )
+
         return queryset
+
+
 
     def get(self, request: Request) -> Response:
         books = self.get_filtered_queryset(request.query_params)

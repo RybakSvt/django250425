@@ -6,6 +6,7 @@ __all__ = [
     "UserListSerializer",
     "UserDetailSerializer",
     "UserCreateSerializer",
+    "CategorySerializer",
 ]
 
 from .books import (
@@ -19,4 +20,8 @@ from .users import (
     UserListSerializer,
     UserDetailSerializer,
     UserCreateSerializer
+)
+
+from .categories import (
+    CategorySerializer
 )

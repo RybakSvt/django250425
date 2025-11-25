@@ -9,8 +9,8 @@ from library.serializers.categories import CategorySerializer
 
 
 class BookListSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
-    author = AuthorShortInfoSerializer()
+    # category = CategorySerializer()
+    # author = AuthorShortInfoSerializer()
 
     class Meta:
         model = Book
