@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 
 from library.models import Book
 from library.serializers import (
@@ -11,6 +14,23 @@ from library.serializers import (
     BookUpdateSerializer
 )
 
+
+
+class BookListInRangeGenericView(ListAPIView):
+    serializer_class = BookListSerializer
+
+    def get_queryset(self):
+        date_format = "%Y-%m-%d"  # 2025-01-01
+
+        # '2025-01-01' -> datetime.strptime() -> datetime(2025, 1, 1, 0, 0, 0) -> .date() -> datetime(2025, 1, 1)
+        start = datetime.strptime(self.kwargs['date_from'], date_format).date()
+        end = datetime.strptime(self.kwargs['date_to'], date_format).date()
+
+        qs = Book.objects.filter(
+            publication_date__range=[start, end]
+        )
+
+        return qs
 
 class BookListCreateAPIView(APIView):
 
