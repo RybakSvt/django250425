@@ -1,12 +1,15 @@
 from datetime import datetime
 
+from rest_framework.decorators import api_view
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 from rest_framework.generics import ListAPIView
+from rest_framework.viewsets import ModelViewSet
 
-from library.models import Book
+from library.models import Book, Publisher
 from library.serializers import (
     BookListSerializer,
     BookDetailedSerializer,
@@ -55,12 +58,14 @@ class BookListCreateAPIView(APIView):
 
     def get(self, request: Request) -> Response:
         books = self.get_filtered_queryset(request.query_params)
-        books_dto = BookListSerializer(books, many=True)
 
-        return Response(
-            data=books_dto.data,
-            status=status.HTTP_200_OK
-        )
+        paginator = PageNumberPagination()
+        # paginator.page_size = 10  # можно не указывать, берётся из settings
+
+        page = paginator.paginate_queryset(books, request)
+        serializer = BookListSerializer(page, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request: Request) -> Response:
         # DTO
@@ -197,6 +202,23 @@ class BookRetrieveUpdateDestroyAPIView(APIView):
             data={},
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+@api_view(['POST'])
+def create_book_with_publisher(request):
+    try:
+        publisher = Publisher.objects.create(name="New Publisher", established_date="2024-06-01")
+        book = Book.objects.create(
+            title="The Great Gatsby",
+            author="F. Scott Fitzgerald",
+            published_date="1925-04-10",
+            publisher=publisher
+        )
+        serializer = BookCreateSerializer(book)
+        return Response(serializer.data)
+    except Exception as e:
+        # Обработка ошибки, если создание книги не удалось
+        return Response({'error': str(e)}, status=400)
 
 
 #

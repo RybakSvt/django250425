@@ -1,5 +1,6 @@
 from django.core.validators import MaxValueValidator
 from django.db import models
+from library.models.managers import SoftDeleteManager
 
 
 class Book(models.Model):
@@ -30,6 +31,10 @@ class Book(models.Model):
     libraries = models.ManyToManyField('Library', related_name='books')
     contributor = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
 
+    is_deleted = models.BooleanField(default=False)
+
+    objects = SoftDeleteManager()
+
     @property
     def rating(self):
         reviews = self.reviews.all()
@@ -48,6 +53,11 @@ class Book(models.Model):
         verbose_name = "Book"
         verbose_name_plural = "Books"
         ordering = ['title']
+
+
+    def delete(self, *args, **kwargs):
+        self.is_deleted = True
+        self.save()
 
 
     def __str__(self):

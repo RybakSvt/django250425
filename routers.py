@@ -1,13 +1,20 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
+from library.views.books import BookListCreateAPIView
 from library.views.publishers import PublisherViewSet
+from library.views.posts import PostViewSet
+from library.views.events import EventViewSet
 
 
-router = SimpleRouter()
-# router = DefaultRouter()
+
+
+#router = SimpleRouter()
+router = DefaultRouter()
 router.register('publisher', PublisherViewSet)  # /api/v1/publishers/
-                                                      # /api/v1/publishers/<pk>
+router.register('posts', PostViewSet, basename='posts')                                                      # /api/v1/publishers/<pk>
+router.register('events', EventViewSet, basename='events')
+
 
 
 urlpatterns = [

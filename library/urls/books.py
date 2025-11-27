@@ -3,7 +3,7 @@ from django.urls import path, re_path
 from library.views.books import (
     BookListCreateAPIView,
     BookRetrieveUpdateDestroyAPIView,
-    BookListInRangeGenericView
+    BookListInRangeGenericView, create_book_with_publisher
 )
 
 urlpatterns = [
@@ -13,4 +13,9 @@ urlpatterns = [
         BookListInRangeGenericView.as_view()
     ),
     path('<int:book_id>/', BookRetrieveUpdateDestroyAPIView.as_view()),
+
+
+    path('books/transactions', create_book_with_publisher),
+
+
 ]

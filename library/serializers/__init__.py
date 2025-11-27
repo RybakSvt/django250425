@@ -10,6 +10,12 @@ __all__ = [
     "PublisherCreateUpdateSerializer",
     "PublisherListSerializer",
     "PublisherDetailSerializer",
+
+    "PostListSerializer",
+    "PostRetrieveSerializer",
+    "PostWriterSerializer",
+
+    "EventSerializer",
 ]
 
 from .books import (
@@ -18,6 +24,7 @@ from .books import (
     BookCreateSerializer,
     BookUpdateSerializer
 )
+
 
 from .users import (
     UserListSerializer,
@@ -32,3 +39,12 @@ from .publishers import (
     PublisherListSerializer,
     PublisherDetailSerializer
 )
+
+
+from .posts import (
+    PostListSerializer,
+    PostRetrieveSerializer,
+    PostWriterSerializer,
+)
+
+from .events import EventSerializer
