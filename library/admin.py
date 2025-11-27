@@ -29,21 +29,30 @@ class AuthorAdmin(admin.ModelAdmin):
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    list_display = [
-        'title',
-        'publication_date',
-        'author',
-        'page_count',
-        'category',
-        'custom_field'
-    ]
+    list_display = ('title', 'publication_date', 'author', 'is_deleted')
+    list_editable = ('is_deleted',)
+    list_filter = ['is_deleted', 'author',]
 
-    @admin.display(description='кол-во библиотек')
-    def custom_field(self, obj: Book):
-        count = obj.libraries.count()
+    def get_queryset(self, request):
+        return Book.admin_objects.all()
 
-        return count
-
+# @admin.register(Book)
+# class BookAdmin(admin.ModelAdmin):
+#     list_display = [
+#         'title',
+#         'publication_date',
+#         'author',
+#         'page_count',
+#         'category',
+#         'custom_field',
+#     ]
+#
+#     @admin.display(description='кол-во библиотек')
+#     def custom_field(self, obj: Book):
+#         count = obj.libraries.count()
+#
+#         return count
+#
 
 @admin.register(User)
 class CustomUserAdmin(BaseUserAdmin):
