@@ -4,6 +4,17 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 
+from rest_framework.authtoken.models import Token
+from library.models import User
+
+user = User.objects.get(username='sveta')
+
+token, created = Token.objects.get_or_create(user=user)
+print(token.user)
+print(token.user)
+print(token.key)
+
+
 # from test_app.models import (
 #     Book,
 #     UserProfile
