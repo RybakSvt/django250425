@@ -14,6 +14,8 @@ from pathlib import Path
 
 from sqlite_log_fact import TracedConnection
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'drf_yasg',
 
     # local
     # 'test_app.apps.TestAppConfig',
@@ -130,8 +133,13 @@ AUTH_PASSWORD_VALIDATORS = [
     # }
 ]
 
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': True
+}
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication'
         # 'rest_framework.authentication.TokenAuthentication'
         # 'rest_framework.authentication.BasicAuthentication'
@@ -148,7 +156,7 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=10),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKEN': False,
     'BLACKLIST_AFTER_ROTATION': False,
