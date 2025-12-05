@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from library.views.books import BookViewSet
 from library.views.publishers import PublisherViewSet
-
+from library.views.users import UserLoginAPIView, RegisterUser, LogOutUser
 
 router = SimpleRouter()
 # router = DefaultRouter()
@@ -21,4 +21,9 @@ urlpatterns = [
     path('token-auth/', obtain_auth_token),
     path('jwt-auth/', TokenObtainPairView.as_view()),
     path('jwt-refresh/', TokenRefreshView.as_view()),
+
+    # login \ logout
+    path('auth/register/', RegisterUser.as_view()),
+    path('auth/login/', UserLoginAPIView.as_view()),
+    path('auth/logout/', LogOutUser.as_view()),
 ] + router.urls
